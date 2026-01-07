@@ -155,7 +155,7 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
         labelText: label,
         filled: true,
         fillColor: Colors.white,
-        labelStyle: const TextStyle(color: Colors.green),
+        labelStyle: const TextStyle(color: Colors.black),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.green.shade200),
@@ -167,7 +167,7 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
       }).toList(),
       onChanged: onChanged,
       dropdownColor: Colors.green.shade100,
-      style: const TextStyle(color: Colors.green),
+      style: const TextStyle(color: Colors.black),
     );
   }
 
