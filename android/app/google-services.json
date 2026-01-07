@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "886591291200",
+    "project_id": "dmt-seba-eaf1f",
+    "storage_bucket": "dmt-seba-eaf1f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886591291200:android:cadafd04df8bd75f0a84a5",
+        "android_client_info": {
+          "package_name": "com.example.dmt_seba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886591291200-9blrnotdmdc55dinphp25mk71cpe24q0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvZ9sKwo9N8GgAOOvbGmAgMhA5qsKaVDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886591291200-9blrnotdmdc55dinphp25mk71cpe24q0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "886591291200-8f3jisn8jvunogfb4b4m8oe8b85jj5ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dmtSeba"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
