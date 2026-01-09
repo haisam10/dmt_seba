@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'google_auth_service.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'login_page.dart';
+import 'main.dart';
 
 // ------------------- HomePage -------------------
 class HomePage extends StatefulWidget {
@@ -22,43 +24,92 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> logout() async {
     await GoogleAuthService.signOut();
-    if (mounted) Navigator.pop(context);
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Dashboard"),
-        actions: [
-          IconButton(onPressed: logout, icon: const Icon(Icons.logout)),
-        ],
-        backgroundColor: Colors.green.shade700,
+        title: Row(
+          children: [
+            Image.asset(
+              'lib/images/icon.png',
+              height: 30,
+            ),
+            const SizedBox(width: 10),
+            const Text("ঢাকা মেট্রো সেবা"),
+          ],
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        titleTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onPrimary,
+          fontSize: 20, 
+          fontWeight: FontWeight.w600, 
+        ),
       ),
-      backgroundColor: Colors.green.shade50,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              accountName: Text(
+                user?.displayName ?? "User",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+              accountEmail: Text(
+                user?.email ?? "No Email",
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
+              ),
+              currentAccountPicture: user?.photoURL != null
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(user!.photoURL!),
+                    )
+                  : CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                      child: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
+                    ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.brightness_6),
+              title: const Text('Switch Theme'),
+              trailing: Switch(
+                value: themeNotifier.value == ThemeMode.dark,
+                onChanged: (value) {
+                  themeNotifier.value =
+                      value ? ThemeMode.dark : ThemeMode.light;
+                },
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: logout,
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            if (user?.photoURL != null)
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(user!.photoURL!),
-              ),
-            const SizedBox(height: 10),
-            Text(
-              user?.displayName ?? "User",
-              style: const TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.bold, color: Colors.green),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              user?.email ?? "No Email",
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const Divider(height: 40, thickness: 2),
-
-            const MetroFareCalculator(),
+            MetroFareCalculator(),
           ],
         ),
       ),
@@ -154,11 +205,14 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: Colors.white,
-        labelStyle: const TextStyle(color: Colors.black),
+        fillColor: Theme.of(context).colorScheme.surface,
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.green.shade200),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       value: value,
@@ -166,8 +220,8 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
         return DropdownMenuItem(value: station, child: Text(station));
       }).toList(),
       onChanged: onChanged,
-      dropdownColor: Colors.green.shade100,
-      style: const TextStyle(color: Colors.black),
+      dropdownColor: Theme.of(context).colorScheme.surfaceVariant,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
     );
   }
 
@@ -185,11 +239,11 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.green.shade100,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.shade200.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -198,12 +252,12 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          Text(
             "Metro Fare Calculator",
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.green,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(height: 20),
@@ -222,10 +276,10 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
             child: Center(
               child: Text(
                 fare == 0 ? "Select stations" : "Fare: $fare BDT",
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green),
+                    color: Theme.of(context).colorScheme.primary),
               ),
             ),
           ),
@@ -233,14 +287,15 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
           ElevatedButton(
             onPressed: payFare,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text(
               "Pay Fare",
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(fontSize: 18),
             ),
           ),
         ],
@@ -318,7 +373,8 @@ class _PaymentPageState extends State<PaymentPage> {
           onPressed: openCheckout,
           child: Text("Pay ${widget.amount} BDT"),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),

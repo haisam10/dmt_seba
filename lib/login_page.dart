@@ -28,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
             context, MaterialPageRoute(builder: (_) => const HomePage()));
       }
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.message ?? "Login failed"),
