@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'register_page.dart';
-import 'google_auth_service.dart';
+import '../google_auth_service.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: loginWithGoogle,
-                  icon: Image.asset('lib/images/Google-icon.png', height: 24),
+                  icon: Image.asset('lib/images/Google-icon.png', height: 20),
                   label: const Text(
                     "Continue with Google",
                     style: TextStyle(

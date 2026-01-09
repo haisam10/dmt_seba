@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import 'bkash.dart';
-import 'google_auth_service.dart';
+import '../PaymentPage/bkash.dart';
+import '../google_auth_service.dart';
 import 'login_page.dart';
-import 'main.dart';
-import 'nagad.dart';
-import 'rocket.dart';
+import '../main.dart';
+import '../PaymentPage/nagad.dart';
+import '../PaymentPage/rocket.dart';
 
 // ------------------- HomePage -------------------
 class HomePage extends StatefulWidget {
