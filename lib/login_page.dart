@@ -58,10 +58,10 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              const Icon(Icons.lock, size: 80, color: Colors.green),
+              Image.asset('lib/images/lodgings.png', height: 90),
               const SizedBox(height: 10),
               const Text(
-                "Dhaka Metro Transport",
+                "ঢাকা মেট্রো সেবা",
                 style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: loginWithGoogle,
-                  icon: const Icon(Icons.g_mobiledata, size: 28),
+                  icon: Image.asset('lib/images/Google-icon.png', height: 24),
                   label: const Text(
                     "Continue with Google",
                     style: TextStyle(

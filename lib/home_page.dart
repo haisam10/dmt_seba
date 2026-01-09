@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'google_auth_service.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+
+import 'bkash.dart';
+import 'google_auth_service.dart';
 import 'login_page.dart';
 import 'main.dart';
+import 'nagad.dart';
+import 'rocket.dart';
 
 // ------------------- HomePage -------------------
 class HomePage extends StatefulWidget {
@@ -24,65 +28,63 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> logout() async {
     await GoogleAuthService.signOut();
-    if (mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
-    }
+    if (!mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+          (route) => false,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset(
-              'lib/images/icon.png',
-              height: 30,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.asset('lib/images/icon.png', height: 30),
             ),
             const SizedBox(width: 10),
-            const Text("ঢাকা মেট্রো সেবা"),
+            const Text('ঢাকা মেট্রো সেবা'),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: cs.primary,
         titleTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
-          fontSize: 20, 
-          fontWeight: FontWeight.w600, 
+          color: cs.onPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
+        iconTheme: IconThemeData(color: cs.onPrimary),
       ),
-
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              decoration: BoxDecoration(color: cs.primary),
               accountName: Text(
                 user?.displayName ?? "User",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: cs.onPrimary,
                 ),
               ),
               accountEmail: Text(
                 user?.email ?? "No Email",
-                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
+                style: TextStyle(color: cs.onPrimary.withAlpha(200)),
               ),
               currentAccountPicture: user?.photoURL != null
-                  ? CircleAvatar(
-                      backgroundImage: NetworkImage(user!.photoURL!),
-                    )
+                  ? CircleAvatar(backgroundImage: NetworkImage(user!.photoURL!))
                   : CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                      child: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
-                    ),
+                backgroundColor: cs.onPrimary,
+                child: Icon(Icons.person, color: cs.primary),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.brightness_6),
@@ -90,8 +92,7 @@ class _HomePageState extends State<HomePage> {
               trailing: Switch(
                 value: themeNotifier.value == ThemeMode.dark,
                 onChanged: (value) {
-                  themeNotifier.value =
-                      value ? ThemeMode.dark : ThemeMode.light;
+                  themeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
                 },
               ),
             ),
@@ -104,13 +105,11 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: cs.surface,
       body: const SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Column(
-          children: [
-            MetroFareCalculator(),
-          ],
+          children: [MetroFareCalculator()],
         ),
       ),
     );
@@ -127,7 +126,7 @@ class MetroFareCalculator extends StatefulWidget {
 
 class _MetroFareCalculatorState extends State<MetroFareCalculator>
     with SingleTickerProviderStateMixin {
-  final List<String> stations = [
+  final List<String> stations = const [
     "Uttara North",
     "Uttara Center",
     "Uttara South",
@@ -150,14 +149,16 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
   String? toStation;
   int fare = 0;
 
-  late AnimationController _controller;
-  late Animation<double> _animation;
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 700));
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
   }
 
@@ -167,9 +168,10 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
       return;
     }
 
-    int diff = (stations.indexOf(toStation!) - stations.indexOf(fromStation!)).abs();
-    int calculatedFare;
+    final diff =
+    (stations.indexOf(toStation!) - stations.indexOf(fromStation!)).abs();
 
+    int calculatedFare;
     if (diff <= 1) {
       calculatedFare = 20;
     } else if (diff <= 3) {
@@ -200,50 +202,64 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
     super.dispose();
   }
 
-  Widget _buildDropdown(String label, String? value, ValueChanged<String?> onChanged) {
+  Widget _buildDropdown(
+      String label,
+      String? value,
+      ValueChanged<String?> onChanged,
+      ) {
+    final cs = Theme.of(context).colorScheme;
+
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surface,
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        fillColor: cs.surface,
+        labelStyle: TextStyle(color: cs.onSurface),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+          borderSide: BorderSide(color: cs.outline),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
       value: value,
-      items: stations.map((station) {
-        return DropdownMenuItem(value: station, child: Text(station));
-      }).toList(),
+      items: stations
+          .map((s) => DropdownMenuItem<String>(value: s, child: Text(s)))
+          .toList(),
       onChanged: onChanged,
-      dropdownColor: Theme.of(context).colorScheme.surfaceVariant,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      dropdownColor: cs.surfaceContainerHighest,
+      style: TextStyle(color: cs.onSurface),
     );
   }
 
   void payFare() {
-    if (fare <= 0) return;
+    if (fare <= 0 || fromStation == null || toStation == null) return;
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => PaymentPage(amount: fare)),
+      MaterialPageRoute(
+        builder: (_) => PaymentMethodPage(
+          amount: fare,
+          fromStation: fromStation!,
+          toStation: toStation!,
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+            color: cs.shadow.withAlpha(25), // Adjusted for subtle shadow
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -257,17 +273,17 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
+              color: cs.primary,
             ),
           ),
           const SizedBox(height: 20),
           _buildDropdown("From Station", fromStation, (value) {
-            fromStation = value;
+            setState(() => fromStation = value);
             calculateFare();
           }),
           const SizedBox(height: 15),
           _buildDropdown("To Station", toStation, (value) {
-            toStation = value;
+            setState(() => toStation = value);
             calculateFare();
           }),
           const SizedBox(height: 25),
@@ -277,9 +293,10 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
               child: Text(
                 fare == 0 ? "Select stations" : "Fare: $fare BDT",
                 style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary),
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: cs.primary,
+                ),
               ),
             ),
           ),
@@ -287,16 +304,14 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
           ElevatedButton(
             onPressed: payFare,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: cs.primary,
+              foregroundColor: cs.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text(
-              "Pay Fare",
-              style: TextStyle(fontSize: 18),
-            ),
+            child: const Text("Pay Fare", style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
@@ -304,17 +319,146 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
   }
 }
 
-// ------------------- Razorpay Payment Page -------------------
-class PaymentPage extends StatefulWidget {
+// ------------------- Payment Method Selection Page -------------------
+class PaymentMethodPage extends StatelessWidget {
   final int amount;
-  const PaymentPage({super.key, required this.amount});
+  final String fromStation;
+  final String toStation;
+
+  const PaymentMethodPage({
+    super.key,
+    required this.amount,
+    required this.fromStation,
+    required this.toStation,
+  });
+
+  Widget _buildPaymentOption({
+    required BuildContext context,
+    required String assetPath,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        decoration: BoxDecoration(
+          color: color.withAlpha(25), // Adjusted for subtle background
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            Image.asset(assetPath, height: 40),
+            const SizedBox(width: 20),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const Spacer(),
+            Icon(Icons.arrow_forward_ios, color: color),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
-  State<PaymentPage> createState() => _PaymentPageState();
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Select Payment Method"),
+        backgroundColor: cs.primary,
+        titleTextStyle: TextStyle(
+          color: cs.onPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        iconTheme: IconThemeData(color: cs.onPrimary),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildPaymentOption(
+              context: context,
+              assetPath: 'lib/images/bkash-logo.png',
+              label: 'bKash Payment',
+              color: const Color(0xFFe40f6b),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => BkashPage(amount: amount, fromStation: fromStation, toStation: toStation)));
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildPaymentOption(
+              context: context,
+              assetPath: 'lib/images/nagad-logo.png',
+              label: 'Nagad Payment',
+              color: const Color(0xFFf7941d),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => NagadPage(amount: amount, fromStation: fromStation, toStation: toStation)));
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildPaymentOption(
+              context: context,
+              assetPath: 'lib/images/rocket-logo.png',
+              label: 'Rocket Payment',
+              color: const Color(0xFF88278b),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => RocketPage(amount: amount, fromStation: fromStation, toStation: toStation)));
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildPaymentOption(
+              context: context,
+              assetPath: 'lib/images/icon.png',
+              label: 'Razorpay',
+              color: cs.primary,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RazorpayPaymentPage(amount: amount, fromStation: fromStation, toStation: toStation),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _PaymentPageState extends State<PaymentPage> {
-  late Razorpay _razorpay;
+// ------------------- Razorpay Payment Page -------------------
+class RazorpayPaymentPage extends StatefulWidget {
+  final int amount;
+  final String fromStation;
+  final String toStation;
+
+  const RazorpayPaymentPage({
+    super.key, 
+    required this.amount,
+    required this.fromStation,
+    required this.toStation,
+  });
+
+  @override
+  State<RazorpayPaymentPage> createState() => _RazorpayPaymentPageState();
+}
+
+class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
+  late final Razorpay _razorpay;
 
   @override
   void initState() {
@@ -344,17 +488,18 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void openCheckout() {
-    var options = {
+    final options = {
       'key': 'YOUR_RAZORPAY_KEY', // Replace with your key
-      'amount': widget.amount * 100,
+      'amount': widget.amount * 100, // in paisa
       'name': 'Dhaka Metro Transport',
       'description': 'Metro Fare Payment',
       'prefill': {'contact': '', 'email': ''},
     };
+
     try {
       _razorpay.open(options);
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("Razorpay open error: $e");
     }
   }
 
@@ -369,16 +514,16 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Payment")),
       body: Center(
-        child: ElevatedButton(
-          onPressed: openCheckout,
-          child: Text("Pay ${widget.amount} BDT"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('From: ${widget.fromStation} To: ${widget.toStation}'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: openCheckout,
+              child: Text("Pay ${widget.amount} BDT"),
+            ),
+          ],
         ),
       ),
     );
