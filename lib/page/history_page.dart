@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -39,7 +40,7 @@ class _HistoryPageState extends State<HistoryPage> {
           .from('payments')
           .select()
           .eq('user_email', currentUser.email!)
-          .order('created_at', ascending: false);
+          .order('date_and_time', ascending: false);
 
       setState(() {
         _payments = response;
@@ -56,10 +57,9 @@ class _HistoryPageState extends State<HistoryPage> {
   String _formatDateTime(String dateTimeString) {
     try {
       final dateTime = DateTime.parse(dateTimeString);
-      // Simple format: DD/MM/YYYY at HH:MM
       return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year} at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } catch (e) {
-      return dateTimeString; // Fallback to original string
+      return dateTimeString;
     }
   }
 
@@ -119,14 +119,14 @@ class _HistoryPageState extends State<HistoryPage> {
           final fromStation = payment['from_station'] ?? 'N/A';
           final toStation = payment['to_station'] ?? 'N/A';
           final amount = payment['amount']?.toString() ?? 'N/A';
-          final createdAt = _formatDateTime(payment['created_at'] ?? '');
+          final dateTime = _formatDateTime(payment['date_and_time'] ?? '');
+          final otp = payment['otp'];
 
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
             elevation: 3,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: ExpansionTile(
               leading: const Icon(Icons.receipt_long, color: Colors.green, size: 40),
               title: Text(
                 'From: $fromStation\nTo:       $toStation',
@@ -134,12 +134,47 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: Text(createdAt, style: const TextStyle(color: Colors.black54)),
+                child: Text(dateTime, style: const TextStyle(color: Colors.black54)),
               ),
               trailing: Text(
                 '$amount BDT',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
               ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: otp != null
+                      ? Column(
+                          children: [
+                            QrImageView(
+                              data: otp.toString(),
+                              version: QrVersions.auto,
+                              size: 150.0,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Ticket Number: ${otp.toString()}',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.timer_off_outlined, color: Colors.red, size: 24),
+                            SizedBox(width: 8),
+                            Text(
+                              'Ticket Expired',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                )
+              ],
             ),
           );
         },

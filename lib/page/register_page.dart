@@ -35,21 +35,21 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber.shade50,
+      backgroundColor: Colors.green.shade50,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
               const Icon(Icons.app_registration,
-                  size: 80, color: Colors.amber),
+                  size: 80, color: Colors.green),
               const SizedBox(height: 10),
               const Text(
                 "Create Account",
                 style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.amber),
+                    color: Colors.green),
               ),
               const SizedBox(height: 30),
               _inputField(email, "Email", Icons.email),
@@ -57,13 +57,13 @@ class _RegisterPageState extends State<RegisterPage> {
               _inputField(password, "Password", Icons.lock, obscure: true),
               const SizedBox(height: 25),
               loading
-                  ? const CircularProgressIndicator(color: Colors.amber)
+                  ? const CircularProgressIndicator(color: Colors.green)
                   : SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: register,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
+                    backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -89,16 +89,16 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextField(
       controller: controller,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.amber),
+      style: const TextStyle(color: Colors.green),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.amber),
-        prefixIcon: Icon(icon, color: Colors.amber),
+        labelStyle: const TextStyle(color: Colors.green),
+        prefixIcon: Icon(icon, color: Colors.green),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.amber.shade200)),
+            borderSide: BorderSide(color: Colors.green.shade200)),
       ),
     );
   }

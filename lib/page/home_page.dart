@@ -8,6 +8,7 @@ import '../main.dart';
 import '../PaymentPage/bkash.dart';
 import '../PaymentPage/nagad.dart';
 import '../PaymentPage/rocket.dart';
+import 'history_page.dart';
 
 // ------------------- HomePage -------------------
 class HomePage extends StatefulWidget {
@@ -85,6 +86,13 @@ class _HomePageState extends State<HomePage> {
                 backgroundColor: cs.onPrimary,
                 child: Icon(Icons.person, color: cs.primary),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text('History'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryPage()));
+              },
             ),
             ListTile(
               leading: const Icon(Icons.brightness_6),
