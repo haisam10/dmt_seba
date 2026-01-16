@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'register_page.dart';
 import '../google_auth_service.dart';
+import 'register_page.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,7 +13,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final email = TextEditingController();
-  
   final password = TextEditingController();
   bool loading = false;
 
@@ -135,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
               )
             ],
 
-            
+
           ),
         ),
       ),

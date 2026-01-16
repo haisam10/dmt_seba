@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'otp_verification_page.dart';
 
@@ -25,6 +26,7 @@ class _BkashPageState extends State<BkashPage> {
   bool isLoading = false;
 
   final supabase = Supabase.instance.client;
+  final firebaseAuth = FirebaseAuth.instance;
 
   int _generateOtp() {
     return Random().nextInt(90000) + 10000; // 5 digit OTP
@@ -41,7 +43,7 @@ class _BkashPageState extends State<BkashPage> {
       return;
     }
 
-    final currentUser = supabase.auth.currentUser;
+    final currentUser = firebaseAuth.currentUser;
     if (currentUser == null || currentUser.email == null) {
       _showMessage('Authentication error. Please log in again.');
       return;

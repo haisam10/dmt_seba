@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../PaymentPage/bkash.dart';
 import '../google_auth_service.dart';
 import 'login_page.dart';
 import '../main.dart';
+import '../PaymentPage/bkash.dart';
 import '../PaymentPage/nagad.dart';
 import '../PaymentPage/rocket.dart';
 
@@ -223,7 +223,7 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      initialValue: value,
+      value: value,
       items: stations
           .map((s) => DropdownMenuItem<String>(value: s, child: Text(s)))
           .toList(),
@@ -417,111 +417,6 @@ class PaymentMethodPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => RocketPage(amount: amount, fromStation: fromStation, toStation: toStation)));
               },
-            ),
-            const SizedBox(height: 16),
-            _buildPaymentOption(
-              context: context,
-              assetPath: 'lib/images/icon.png',
-              label: 'Razorpay',
-              color: cs.primary,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RazorpayPaymentPage(amount: amount, fromStation: fromStation, toStation: toStation),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ------------------- Razorpay Payment Page -------------------
-class RazorpayPaymentPage extends StatefulWidget {
-  final int amount;
-  final String fromStation;
-  final String toStation;
-
-  const RazorpayPaymentPage({
-    super.key, 
-    required this.amount,
-    required this.fromStation,
-    required this.toStation,
-  });
-
-  @override
-  State<RazorpayPaymentPage> createState() => _RazorpayPaymentPageState();
-}
-
-class _RazorpayPaymentPageState extends State<RazorpayPaymentPage> {
-  late final Razorpay _razorpay;
-
-  @override
-  void initState() {
-    super.initState();
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Payment Success: ${response.paymentId}")),
-    );
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Payment Failed: ${response.message}")),
-    );
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("External Wallet: ${response.walletName}")),
-    );
-  }
-
-  void openCheckout() {
-    final options = {
-      'key': 'YOUR_RAZORPAY_KEY', // Replace with your key
-      'amount': widget.amount * 100, // in paisa
-      'name': 'Dhaka Metro Transport',
-      'description': 'Metro Fare Payment',
-      'prefill': {'contact': '', 'email': ''},
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint("Razorpay open error: $e");
-    }
-  }
-
-  @override
-  void dispose() {
-    _razorpay.clear();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Payment")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('From: ${widget.fromStation} To: ${widget.toStation}'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: openCheckout,
-              child: Text("Pay ${widget.amount} BDT"),
             ),
           ],
         ),
