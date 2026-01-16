@@ -1,6 +1,10 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'otp_verification_page.dart';
 
-class RocketPage extends StatelessWidget {
+class RocketPage extends StatefulWidget {
   final int amount;
   final String fromStation;
   final String toStation;
@@ -13,50 +17,172 @@ class RocketPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final rocketColor = const Color(0xFF88278b);
+  State<RocketPage> createState() => _RocketPageState();
+}
 
+class _RocketPageState extends State<RocketPage> {
+  final _phoneController = TextEditingController();
+  final _pinController = TextEditingController();
+  bool isLoading = false;
+
+  final supabase = Supabase.instance.client;
+  final firebaseAuth = FirebaseAuth.instance;
+
+  int _generateOtp() {
+    return Random().nextInt(90000) + 10000; // 5 digit OTP
+  }
+
+  Future<void> _payNow() async {
+    if (_phoneController.text.length != 12) { // Rocket account can be 12 digits
+      _showMessage('Enter a valid Rocket account number');
+      return;
+    }
+
+    if (_pinController.text.length != 4) { // Rocket PIN is 4 digits
+      _showMessage('PIN must be 4 digits');
+      return;
+    }
+
+    final currentUser = firebaseAuth.currentUser;
+    if (currentUser == null || currentUser.email == null) {
+      _showMessage('Authentication error. Please log in again.');
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final otp = _generateOtp();
+
+      await supabase.from('payments').insert({
+        'user_email': currentUser.email!,
+        'from_station': widget.fromStation,
+        'to_station': widget.toStation,
+        'rocket_phone': _phoneController.text, // Specific column for Rocket
+        'amount': widget.amount,
+        'otp': otp,
+      });
+      
+      setState(() => isLoading = false);
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OtpVerificationPage(
+              bkashPhone: _phoneController.text,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => isLoading = false);
+      _showMessage('Payment failed: ${e.toString()}');
+    }
+  }
+
+  void _showMessage(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rocket Payment'),
-        backgroundColor: rocketColor,
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
+        backgroundColor: const Color(0xFF88278b),
         iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Welcome to Rocket',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: const Color(0xfff3e9f3),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Rocket Payment',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 25),
+
+            _infoRow('From', widget.fromStation),
+            _infoRow('To', widget.toStation),
+            _infoRow('Amount', '${widget.amount} BDT'),
+
+            const SizedBox(height: 25),
+
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Rocket Account Number',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 30),
-              Text(
-                'From: $fromStation',
-                style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: _pinController,
+              keyboardType: TextInputType.number,
+              obscureText: true,
+              maxLength: 4, // Rocket PIN is 4 digits
+              decoration: const InputDecoration(
+                labelText: '4 Digit Rocket PIN',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 10),
-              Text(
-                'To: $toStation',
-                style: const TextStyle(fontSize: 18),
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : _payNow,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF88278b),
+                  foregroundColor: Colors.white,
+                ),
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                  'Pay Now',
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                'Amount to pay: $amount BDT',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _infoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 16)),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

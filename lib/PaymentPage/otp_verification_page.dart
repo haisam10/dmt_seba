@@ -4,11 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class OtpVerificationPage extends StatefulWidget {
-  final String bkashPhone;
+  final String bkashPhone; // This now represents any phone number
 
   const OtpVerificationPage({
     super.key,
-    required this.bkashPhone,
+    required this.bkashPhone, 
   });
 
   @override
@@ -41,13 +41,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         throw Exception('Authentication error. Please log in again.');
       }
 
-      // Fetch the latest OTP for the user and phone number
+      // Fetch the latest OTP for the user. It can be from bKash, Nagad or Rocket.
       final response = await supabase
           .from('payments')
           .select('otp')
           .eq('user_email', currentUser.email!)
-          .eq('bkash_phone', widget.bkashPhone)
-          .order('created_at', ascending: false) // Get the most recent one
+          .or('bkash_phone.eq.${widget.bkashPhone},nagad_phone.eq.${widget.bkashPhone},rocket_phone.eq.${widget.bkashPhone}') // Check in all phone columns
+          .order('created_at', ascending: false)
           .limit(1)
           .maybeSingle();
 
@@ -147,6 +147,6 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       );
     }
 
-    return const Text('Something went wrong.'); // Should not be reached
+    return const Text('Something went wrong.');
   }
 }
