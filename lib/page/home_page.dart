@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
-
 import '../google_auth_service.dart';
 import 'login_page.dart';
 import '../main.dart';
@@ -214,6 +212,7 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
       String label,
       String? value,
       ValueChanged<String?> onChanged,
+      String? stationToDisable, // New parameter to disable a specific station
       ) {
     final cs = Theme.of(context).colorScheme;
 
@@ -232,9 +231,19 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
         ),
       ),
       value: value,
-      items: stations
-          .map((s) => DropdownMenuItem<String>(value: s, child: Text(s)))
-          .toList(),
+      items: stations.map((station) {
+        final bool isEnabled = station != stationToDisable;
+        return DropdownMenuItem<String>(
+          value: station,
+          enabled: isEnabled,
+          child: Text(
+            station,
+            style: TextStyle(
+              color: isEnabled ? cs.onSurface : Colors.grey,
+            ),
+          ),
+        );
+      }).toList(),
       onChanged: onChanged,
       dropdownColor: cs.surfaceContainerHighest,
       style: TextStyle(color: cs.onSurface),
@@ -288,12 +297,12 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
           _buildDropdown("From Station", fromStation, (value) {
             setState(() => fromStation = value);
             calculateFare();
-          }),
+          }, toStation), // Disable the 'to' station in the 'from' dropdown
           const SizedBox(height: 15),
           _buildDropdown("To Station", toStation, (value) {
             setState(() => toStation = value);
             calculateFare();
-          }),
+          }, fromStation), // Disable the 'from' station in the 'to' dropdown
           const SizedBox(height: 25),
           ScaleTransition(
             scale: _animation,
