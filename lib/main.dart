@@ -1,15 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options.dart';
 import 'page/login_page.dart';
 
 final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.system);
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: 'https://jydooivrdwtrhbuacbiu.supabase.co',
+    anonKey: 'sb_publishable_KbHtqKjcXDWqNYAkMK0yZw_G7r1KvFd',
+  );
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
 }
 

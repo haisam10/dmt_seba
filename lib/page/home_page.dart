@@ -223,7 +223,7 @@ class _MetroFareCalculatorState extends State<MetroFareCalculator>
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      value: value,
+      initialValue: value,
       items: stations
           .map((s) => DropdownMenuItem<String>(value: s, child: Text(s)))
           .toList(),

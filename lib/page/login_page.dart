@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              Image.asset('lib/images/lodgings.png', height: 90),
+              Image.asset('lib/images/main-icon.png', height: 90),
               const SizedBox(height: 10),
               const Text(
                 "ঢাকা মেট্রো সেবা",
@@ -123,10 +123,18 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 child: const Text(
                   "Create new account",
-                  style: TextStyle(color: Colors.green),
+                  style: TextStyle(
+                    color: Colors.green,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.green,
+                    decorationThickness: 2,
+                  ),
                 ),
+
               )
             ],
+
+            
           ),
         ),
       ),
