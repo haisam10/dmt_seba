@@ -41,14 +41,19 @@ class _BkashPageState extends State<BkashPage> {
       return;
     }
 
+    final currentUser = supabase.auth.currentUser;
+    if (currentUser == null || currentUser.email == null) {
+      _showMessage('Authentication error. Please log in again.');
+      return;
+    }
+
     setState(() => isLoading = true);
 
     try {
       final otp = _generateOtp();
-      final userEmail = supabase.auth.currentUser?.email ?? 'unknown';
 
       await supabase.from('payments').insert({
-        'user_email': userEmail,
+        'user_email': currentUser.email!,
         'from_station': widget.fromStation,
         'to_station': widget.toStation,
         'bkash_phone': _phoneController.text,
